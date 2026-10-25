@@ -44,6 +44,22 @@ def test_alert_when_shopee_expiring():
     mock_send.assert_called_once()
 
 
+def test_alert_sent_to_multiple_recipients():
+    env = {
+        "THREADS_TOKEN_EXPIRY": iso(3),
+        "GMAIL_USER": "a@gmail.com",
+        "GMAIL_APP_PASSWORD": "pw",
+        "ALERT_EMAIL": "b@gmail.com,c@gmail.com",
+    }
+    with patch.dict(os.environ, env):
+        checker = TokenChecker()
+        with patch("smtplib.SMTP") as mock_smtp:
+            mock_server = mock_smtp.return_value.__enter__.return_value
+            checker.check_and_alert()
+    sendmail_args = mock_server.sendmail.call_args
+    assert sendmail_args[0][1] == ["b@gmail.com", "c@gmail.com"]
+
+
 def test_skips_missing_expiry_gracefully():
     env = {"GMAIL_USER": "a@gmail.com", "GMAIL_APP_PASSWORD": "pw", "ALERT_EMAIL": "b@gmail.com"}
     with patch.dict(os.environ, env, clear=True):

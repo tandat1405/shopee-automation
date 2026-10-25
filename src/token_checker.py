@@ -41,12 +41,14 @@ class TokenChecker:
         gmail_password = os.environ["GMAIL_APP_PASSWORD"]
         alert_email = os.environ["ALERT_EMAIL"]
 
+        recipients = [e.strip() for e in alert_email.split(",") if e.strip()]
+
         msg = MIMEText(body, "plain", "utf-8")
         msg["Subject"] = subject
         msg["From"] = gmail_user
-        msg["To"] = alert_email
+        msg["To"] = ", ".join(recipients)
 
         with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
             smtp.starttls()
             smtp.login(gmail_user, gmail_password)
-            smtp.sendmail(gmail_user, alert_email, msg.as_string())
+            smtp.sendmail(gmail_user, recipients, msg.as_string())

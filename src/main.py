@@ -3,7 +3,7 @@ import os
 
 from src.content_generator import ContentGenerator
 from src.product_tracker import ProductTracker
-from src.shopee_client import ShopeeAPIError, ShopeeClient
+from src.sheets_client import SheetsClient, SheetsError
 from src.threads_client import ThreadsAPIError, ThreadsClient
 from src.token_checker import TokenChecker
 
@@ -20,9 +20,9 @@ def main():
         logger.error("TokenChecker failed: %s", e)
 
     try:
-        items = ShopeeClient().get_active_items()
-    except ShopeeAPIError as e:
-        logger.error("Shopee API error, skipping today: %s", e)
+        items = SheetsClient().get_items()
+    except SheetsError as e:
+        logger.error("Google Sheet error, skipping today: %s", e)
         return
 
     tracker = ProductTracker(DATA_PATH)

@@ -25,11 +25,7 @@ jobs:
 
       - name: Run daily post
         env:
-          SHOPEE_PARTNER_ID: ${{ secrets.SHOPEE_PARTNER_ID }}
-          SHOPEE_PARTNER_KEY: ${{ secrets.SHOPEE_PARTNER_KEY }}
-          SHOPEE_SHOP_ID: ${{ secrets.SHOPEE_SHOP_ID }}
-          SHOPEE_ACCESS_TOKEN: ${{ secrets.SHOPEE_ACCESS_TOKEN }}
-          SHOPEE_TOKEN_EXPIRY: ${{ secrets.SHOPEE_TOKEN_EXPIRY }}
+          GOOGLE_SHEET_CSV_URL: ${{ secrets.GOOGLE_SHEET_CSV_URL }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           THREADS_TOKEN_EXPIRY: ${{ secrets.THREADS_TOKEN_EXPIRY }}

@@ -40,6 +40,19 @@ def test_network_error_is_retried_then_skipped():
                 client.publish_post("Text", "http://img/1.jpg")
 
 
+def test_falls_back_to_text_post_when_image_url_empty():
+    with patch.dict(os.environ, ENV):
+        client = ThreadsClient()
+        with patch.object(client, "_post") as mock_post, \
+             patch.object(client, "_get") as mock_get:
+            mock_post.side_effect = [{"id": "c1"}, {"id": "p1"}]
+            mock_get.return_value = {"status": "FINISHED"}
+            client.publish_post("Text", "")
+    first_call_params = mock_post.call_args_list[0][0][1]
+    assert first_call_params["media_type"] == "TEXT"
+    assert "image_url" not in first_call_params
+
+
 def test_polls_until_finished():
     with patch.dict(os.environ, ENV):
         client = ThreadsClient()

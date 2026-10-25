@@ -31,10 +31,13 @@ class ThreadsClient:
         return self._publish(container_id)
 
     def _create_container(self, text: str, image_url: str) -> str:
-        response = self._post(
-            f"/{self._user_id}/threads",
-            {"media_type": "IMAGE", "image_url": image_url, "text": text},
-        )
+        params = {"text": text}
+        if image_url and image_url.strip():
+            params["media_type"] = "IMAGE"
+            params["image_url"] = image_url
+        else:
+            params["media_type"] = "TEXT"
+        response = self._post(f"/{self._user_id}/threads", params)
         if "error" in response or "id" not in response:
             raise ThreadsAPIError(f"Container creation failed: {response}")
         return response["id"]

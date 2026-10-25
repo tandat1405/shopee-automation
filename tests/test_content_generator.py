@@ -23,6 +23,15 @@ def test_generate_returns_text_with_link():
     assert "Kẹp tóc" in result
 
 
+def test_generate_raises_on_gemini_api_error():
+    from google.genai import errors as genai_errors
+    with patch.dict(os.environ, {"GEMINI_API_KEY": "fakekey"}):
+        gen = ContentGenerator()
+        with patch.object(gen, "_call_gemini", side_effect=Exception("blocked by safety")):
+            with pytest.raises(ValueError):
+                gen.generate(ITEM)
+
+
 def test_generate_raises_on_empty_response():
     with patch.dict(os.environ, {"GEMINI_API_KEY": "fakekey"}):
         gen = ContentGenerator()

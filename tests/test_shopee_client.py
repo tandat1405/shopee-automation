@@ -53,6 +53,35 @@ def test_get_active_items_returns_list():
     assert "item_url" in items[0]
 
 
+def test_batches_item_ids_in_groups_of_50():
+    ids_51 = [{"item_id": i} for i in range(51)]
+    list_response = {"error": "", "response": {"item": ids_51, "has_next_page": False}}
+    detail_batch1 = {
+        "error": "",
+        "response": {
+            "item_list": [
+                {"item_id": i, "item_name": f"Item {i}", "create_time": i, "image": {"image_url_list": [f"http://img/{i}.jpg"]}}
+                for i in range(50)
+            ]
+        },
+    }
+    detail_batch2 = {
+        "error": "",
+        "response": {
+            "item_list": [
+                {"item_id": 50, "item_name": "Item 50", "create_time": 50, "image": {"image_url_list": ["http://img/50.jpg"]}}
+            ]
+        },
+    }
+    with patch.dict(os.environ, ENV):
+        client = ShopeeClient()
+        with patch.object(client, "_post") as mock_post:
+            mock_post.side_effect = [list_response, detail_batch1, detail_batch2]
+            items = client.get_active_items()
+    assert len(items) == 51
+    assert mock_post.call_count == 3
+
+
 def test_raises_on_api_error():
     with patch.dict(os.environ, ENV):
         client = ShopeeClient()

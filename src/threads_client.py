@@ -63,13 +63,19 @@ class ThreadsClient:
         return response["id"]
 
     def _post(self, path: str, params: dict) -> dict:
-        params["access_token"] = self._access_token
-        resp = requests.post(f"{self.BASE_URL}{path}", params=params, timeout=30)
-        resp.raise_for_status()
-        return resp.json()
+        merged = {**params, "access_token": self._access_token}
+        try:
+            resp = requests.post(f"{self.BASE_URL}{path}", params=merged, timeout=30)
+            resp.raise_for_status()
+            return resp.json()
+        except requests.exceptions.RequestException as e:
+            raise ThreadsAPIError(str(e)) from e
 
     def _get(self, path: str, params: dict) -> dict:
-        params["access_token"] = self._access_token
-        resp = requests.get(f"{self.BASE_URL}{path}", params=params, timeout=30)
-        resp.raise_for_status()
-        return resp.json()
+        merged = {**params, "access_token": self._access_token}
+        try:
+            resp = requests.get(f"{self.BASE_URL}{path}", params=merged, timeout=30)
+            resp.raise_for_status()
+            return resp.json()
+        except requests.exceptions.RequestException as e:
+            raise ThreadsAPIError(str(e)) from e

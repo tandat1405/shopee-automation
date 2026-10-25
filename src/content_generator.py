@@ -15,7 +15,10 @@ class ContentGenerator:
             "Shop bán phụ kiện tóc và quà cho con gái (cột tóc, kẹp tóc, dán mái, sticker idol).\n"
             "Không dùng hashtag. Không emoji quá nhiều. Cuối bài KHÔNG thêm link."
         )
-        raw = self._call_gemini(prompt)
+        try:
+            raw = self._call_gemini(prompt)
+        except Exception as e:
+            raise ValueError(f"Gemini API error: {e}") from e
         if not raw or not raw.strip():
             raise ValueError("Gemini returned empty content")
         return f"{raw.strip()}\n\n🛒 {item['item_url']}"

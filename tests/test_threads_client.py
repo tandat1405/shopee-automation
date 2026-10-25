@@ -2,6 +2,7 @@ import os
 from unittest.mock import patch
 
 import pytest
+import requests
 
 from src.threads_client import ThreadsClient, ThreadsAPIError
 
@@ -26,6 +27,15 @@ def test_raises_on_container_error():
     with patch.dict(os.environ, ENV):
         client = ThreadsClient()
         with patch.object(client, "_post", return_value={"error": {"message": "bad token"}}):
+            with pytest.raises(ThreadsAPIError):
+                client.publish_post("Text", "http://img/1.jpg")
+
+
+def test_network_error_is_retried_then_skipped():
+    with patch.dict(os.environ, ENV):
+        client = ThreadsClient()
+        with patch("requests.post", side_effect=requests.exceptions.ConnectionError("timeout")), \
+             patch("time.sleep"):
             with pytest.raises(ThreadsAPIError):
                 client.publish_post("Text", "http://img/1.jpg")
 

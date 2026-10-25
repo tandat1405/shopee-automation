@@ -44,23 +44,27 @@ class ShopeeClient:
             offset += page_size
         return item_ids
 
+    ITEM_DETAIL_BATCH_SIZE = 50
+
     def _fetch_item_details(self, item_ids: list[int]) -> list[dict]:
-        response = self._post(
-            "/api/v2/item/get_item_base_info",
-            {"item_id_list": item_ids},
-        )
-        if response.get("error"):
-            raise ShopeeAPIError(response.get("message", response["error"]))
         result = []
-        for item in response.get("response", {}).get("item_list", []):
-            image_urls = item.get("image", {}).get("image_url_list", [])
-            result.append({
-                "item_id": str(item["item_id"]),
-                "name": item.get("item_name", ""),
-                "image_url": image_urls[0] if image_urls else "",
-                "item_url": f"https://shopee.vn/product/{self._shop_id}/{item['item_id']}",
-                "create_time": item.get("create_time", 0),
-            })
+        for i in range(0, len(item_ids), self.ITEM_DETAIL_BATCH_SIZE):
+            batch = item_ids[i:i + self.ITEM_DETAIL_BATCH_SIZE]
+            response = self._post(
+                "/api/v2/item/get_item_base_info",
+                {"item_id_list": batch},
+            )
+            if response.get("error"):
+                raise ShopeeAPIError(response.get("message", response["error"]))
+            for item in response.get("response", {}).get("item_list", []):
+                image_urls = item.get("image", {}).get("image_url_list", [])
+                result.append({
+                    "item_id": str(item["item_id"]),
+                    "name": item.get("item_name", ""),
+                    "image_url": image_urls[0] if image_urls else "",
+                    "item_url": f"https://shopee.vn/product/{self._shop_id}/{item['item_id']}",
+                    "create_time": item.get("create_time", 0),
+                })
         return result
 
     def _post(self, path: str, body: dict) -> dict:

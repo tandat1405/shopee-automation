@@ -4,7 +4,7 @@ from google import genai
 
 
 class ContentGenerator:
-    MODEL = "gemini-1.5-flash"
+    MODEL = "gemini-3.8-flash"
 
     def __init__(self):
         self._client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])

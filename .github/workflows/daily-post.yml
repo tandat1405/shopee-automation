@@ -1,9 +1,6 @@
 name: Daily Shopee Post
 
 on:
-  schedule:
-    - cron: '37 5 * * *'
-    - cron: '37 11 * * *'
   workflow_dispatch:
 
 jobs:

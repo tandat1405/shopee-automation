@@ -13,9 +13,10 @@ class ContentGenerator:
 
     def generate(self, item: dict) -> str:
         prompt = (
-            f'Viết ĐÚNG 2-3 dòng tiếng Việt ngắn gọn, tự nhiên để đăng lên Threads quảng cáo sản phẩm "{item["name"]}".\n'
+            f'Viết đúng 30-50 từ tiếng Việt tự nhiên để đăng lên Threads quảng cáo sản phẩm "{item["name"]}".\n'
             "Shop bán phụ kiện tóc và quà cho con gái (cột tóc, kẹp tóc, dán mái, sticker idol).\n"
-            "Chỉ viết 1 đoạn duy nhất, KHÔNG liệt kê nhiều lựa chọn, KHÔNG dùng **bold**, KHÔNG hashtag, KHÔNG thêm link."
+            "Thêm 1-2 emoji đơn giản phù hợp. Viết 1 đoạn hoàn chỉnh, câu kết phải trọn nghĩa.\n"
+            "KHÔNG dùng **bold**, KHÔNG hashtag, KHÔNG thêm link, KHÔNG liệt kê nhiều lựa chọn."
         )
         try:
             raw = self._call_gemini(prompt)
@@ -26,7 +27,8 @@ class ContentGenerator:
         link = f"\n\n🛒 {item['item_url']}"
         text = raw.strip()
         if len(text) + len(link) > self.MAX_TEXT_LENGTH:
-            text = text[: self.MAX_TEXT_LENGTH - len(link) - 3] + "..."
+            last_sentence = max(text.rfind("。"), text.rfind("."), text.rfind("!"), text.rfind("?"))
+            text = text[: last_sentence + 1] if last_sentence > 0 else text[: self.MAX_TEXT_LENGTH - len(link)]
         return f"{text}{link}"
 
     def _call_gemini(self, prompt: str) -> str:

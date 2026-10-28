@@ -4,7 +4,7 @@ from google import genai
 
 
 class ContentGenerator:
-    MODEL = "gemini-3.6-flash"
+    MODELS = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-2.5-flash"]
 
     def __init__(self):
         self._client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
@@ -19,10 +19,16 @@ class ContentGenerator:
             "Cuối bài thêm đúng 3 hashtag: bắt buộc có #viral, kèm 2 hashtag tiếng Việt phù hợp với sản phẩm.\n"
             "KHÔNG dùng **bold**, KHÔNG thêm link, KHÔNG liệt kê nhiều lựa chọn."
         )
-        try:
-            raw = self._call_gemini(prompt)
-        except Exception as e:
-            raise ValueError(f"Gemini API error: {e}") from e
+        last_error = None
+        raw = None
+        for model in self.MODELS:
+            try:
+                raw = self._call_gemini(prompt, model)
+                break
+            except Exception as e:
+                last_error = e
+        if raw is None:
+            raise ValueError(f"Gemini API error: {last_error}") from last_error
         if not raw or not raw.strip():
             raise ValueError("Gemini returned empty content")
         link = f"\n\n🛒 {item['item_url']}"
@@ -32,6 +38,6 @@ class ContentGenerator:
             text = text[: last_sentence + 1] if last_sentence > 0 else text[: self.MAX_TEXT_LENGTH - len(link)]
         return f"{text}{link}"
 
-    def _call_gemini(self, prompt: str) -> str:
-        response = self._client.models.generate_content(model=self.MODEL, contents=prompt)
+    def _call_gemini(self, prompt: str, model: str) -> str:
+        response = self._client.models.generate_content(model=model, contents=prompt)
         return response.text

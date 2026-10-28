@@ -15,8 +15,9 @@ class ContentGenerator:
         prompt = (
             f'Viết đúng 30-50 từ tiếng Việt tự nhiên để đăng lên Threads quảng cáo sản phẩm "{item["name"]}".\n'
             "Shop bán phụ kiện tóc và quà cho con gái (cột tóc, kẹp tóc, dán mái, sticker idol).\n"
-            "Thêm 1-2 emoji đơn giản phù hợp. Viết 1 đoạn hoàn chỉnh, câu kết phải trọn nghĩa.\n"
-            "KHÔNG dùng **bold**, KHÔNG hashtag, KHÔNG thêm link, KHÔNG liệt kê nhiều lựa chọn."
+            "Thêm 1-2 emoji phù hợp xen vào trong câu. Viết 1 đoạn hoàn chỉnh, câu kết phải trọn nghĩa.\n"
+            "Cuối bài thêm đúng 3 hashtag: bắt buộc có #viral, kèm 2 hashtag tiếng Việt phù hợp với sản phẩm.\n"
+            "KHÔNG dùng **bold**, KHÔNG thêm link, KHÔNG liệt kê nhiều lựa chọn."
         )
         try:
             raw = self._call_gemini(prompt)
